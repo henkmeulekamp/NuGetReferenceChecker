@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml.Linq;
 using Meulekamp.NuGetReferenceChecker.EnumarableXmlReaders;
 using Meulekamp.NuGetReferenceChecker.Model;
 
@@ -40,7 +39,7 @@ namespace Meulekamp.NuGetReferenceChecker
             var repositoryRegisteredFiles = _solutionLoader.RepositoryPackageFiles
                 .Select(s => GetFileName(s.Replace("..\\",""), _solutionLoader.SolutionRoot).FullName.ToLowerInvariant()).ToList();
 
-            return _solutionLoader.FoundPackageFiles.Select(S=>S.ToLowerInvariant())
+            return _solutionLoader.FoundPackageFiles.Select(s=>s.ToLowerInvariant())
                 .Except(repositoryRegisteredFiles)
                 .ToList();
         }
@@ -84,7 +83,7 @@ namespace Meulekamp.NuGetReferenceChecker
                     .ToList();
         }
 
-        private string GetProjectsAsString(string packageName, List<VsProject> projects)
+        private static string GetProjectsAsString(string packageName, IEnumerable<VsProject> projects)
         {
             var sb = new StringBuilder();
 
@@ -112,7 +111,7 @@ namespace Meulekamp.NuGetReferenceChecker
         {
             var allErrors = new List<string>();
             //collect all assemblies form used nuget folders
-            List<string> allNugetPackageAssemblies = GetUsedNuGetAllAssemblies();
+            IEnumerable<string> allNugetPackageAssemblies = GetUsedNuGetAllAssemblies();
 
             List<FileInfo> filesOfNuGetAssemblies = allNugetPackageAssemblies.Select(f => new FileInfo(f)).ToList();
 
@@ -130,7 +129,7 @@ namespace Meulekamp.NuGetReferenceChecker
                     references = xmlReader.Stream().Where(r => !string.IsNullOrWhiteSpace(r.HintPath)).ToList();
                 }
 
-                List<string> errors = CheckReferences(project, references, filesOfNuGetAssemblies);
+                IEnumerable<string> errors = CheckReferences(project, references, filesOfNuGetAssemblies);
 
                 if (errors.Any()) allErrors.AddRange(errors);
             }
@@ -138,8 +137,8 @@ namespace Meulekamp.NuGetReferenceChecker
             return allErrors;
         }
 
-        private List<string> CheckReferences(VsProject project, List<Reference> references, 
-            List<FileInfo> filesOfNuGetAssemblies)
+        private IEnumerable<string> CheckReferences(VsProject project, IEnumerable<Reference> references, 
+                                             IEnumerable<FileInfo> filesOfNuGetAssemblies)
         {
             var packageFolder = new FileInfo(_solutionLoader.NuGetRepositoryFile).Directory.FullName.ToLowerInvariant();
 
@@ -149,7 +148,7 @@ namespace Meulekamp.NuGetReferenceChecker
             var files = from inP in filesOfReferencesInProject
                         join inN in filesOfNuGetAssemblies on inP.Name.ToLowerInvariant() equals
                             inN.Name.ToLowerInvariant()
-                        where !ComparerNuGetAssemblyPath(inP.FullName.ToLowerInvariant(), inN.FullName.ToLowerInvariant(), packageFolder)//>!inN.FullName.Equals(inP.FullName)
+                        where !ComparerNuGetAssemblyPath(inP.FullName.ToLowerInvariant(), packageFolder)//>!inN.FullName.Equals(inP.FullName)
                         select new
                                    {
                                        ProjectReference = inP.FullName,
@@ -162,25 +161,14 @@ namespace Meulekamp.NuGetReferenceChecker
                                                    GetPackageNameFromPath(f.NuGetPackage, packageFolder))).ToList();
         }
 
-        private bool ComparerNuGetAssemblyPath(string projectReference, string nuGetAssembly, string packageFolder)
+        private static bool ComparerNuGetAssemblyPath(string projectReference, string packageFolder)
         {
             //if reference is pointing to nuget assemblies then we are good; 
             //FindAllPackagesWithMultipleVersions should find the version mismatches
             return (projectReference.Contains(packageFolder));
-            
-            ////maybe change this to just check if its referencing a nuget folder
-            //var subPathpProjectReference = projectReference.ToLowerInvariant().Replace(packageFolder, "");
-            //var nugetPackageProject = subPathpProjectReference.Substring(0, subPathpProjectReference.IndexOf("\\"));
-
-            //var subPathNuGetAssembly = nuGetAssembly.ToLowerInvariant().Replace(packageFolder, "");
-
-          
-            //var nugetPackageSolution = subPathpProjectReference.Substring(0, subPathNuGetAssembly.IndexOf("\\"));
-
-            //return nugetPackageProject.Equals(nugetPackageSolution, StringComparison.OrdinalIgnoreCase);
         }
 
-        private string GetPackageNameFromPath(string path, string packageFolder)
+        private static string GetPackageNameFromPath(string path, string packageFolder)
         {
             var subPathpProjectReference = path.ToLowerInvariant().Replace(packageFolder, "");
 
@@ -191,12 +179,12 @@ namespace Meulekamp.NuGetReferenceChecker
             return nugetPackageProject.ToLowerInvariant();
         }
 
-        private FileInfo GetFileName(string filePath, string projectpath)
+        private static FileInfo GetFileName(string filePath, string projectpath)
         {
             return new FileInfo(Path.GetFullPath(Path.Combine(projectpath, filePath)));
         }
 
-        private List<string> GetUsedNuGetAllAssemblies()
+        private IEnumerable<string> GetUsedNuGetAllAssemblies()
         {
             var allAssemblies = new List<string>();
 
@@ -210,7 +198,7 @@ namespace Meulekamp.NuGetReferenceChecker
             {
                 string[] files = Directory.GetFiles(d.FullName, "*.dll", SearchOption.AllDirectories);
 
-                if (files != null && files.Any())
+                if (files.Any())
                     allAssemblies.AddRange(files);
             }
 
