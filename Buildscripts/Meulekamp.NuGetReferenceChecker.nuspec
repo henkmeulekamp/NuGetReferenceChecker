@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <version>1.0.0</version>
+    <authors>HJ Meulekamp; henk@meulekamp.net</authors>
+    <owners />
+    <id>NuGetReferenceChecker</id>
+    <title>NuGet reference checker</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<projectUrl>https://github.com/henkmeulekamp/NuGetReferenceChecker</projectUrl>
+    <description>
+	NuGetReferenceChecker can scan projects within a vs.net solution to check if all projects are linked to the correct nuget packages. 
+	</description>
+    <summary>
+	Library containg reference checking logic and .cs class with nunit tests and a commandline app to run the tests.
+	</summary>
+    <tags>nuget csharp unittest referencechecker</tags>
+	<dependencies>
+  <dependency id="CommandLineParser" version="1.9.3.19" />
+</dependencies>
+  </metadata>
+  <files>
+    <file src="..\NuGetReferenceCheck\bin\Release\Meulekamp.NuGetReferenceChecker.dll" target="lib\net40\Meulekamp.NuGetReferenceChecker.dll"/>
+    <file src="..\NuGetReferenceCheck\bin\Release\NuGetReferenceCheck.exe" target="lib\net40\NuGetReferenceCheck.exe" />
+	<file src="..\Meulekamp.NuGetReferenceChecker.UnitTests\ReferenceCheckerTests.cs" target="content\InfraTests\ReferenceCheckerTests.cs" />
+  </files>
+</package>
