@@ -27,9 +27,10 @@ namespace Meulekamp.NuGetReferenceChecker
         /// <returns></returns>
         public List<string> FindAllNonUsedPackages()
         {
-            IEnumerable<string> notUsed = _solutionLoader.NugetPackageFolders.Select(s=>s.ToLowerInvariant()).Except(
-                _solutionLoader.Projects.SelectMany(p => p.ListPackages)
-                    .Select(p => string.Format("{0}.{1}", p.id, p.version).ToLowerInvariant())
+            IEnumerable<string> notUsed = _solutionLoader.NugetPackageFolders
+                                .Select(s=>s.ToLowerInvariant())
+                                .Except(_solutionLoader.Projects.SelectMany(p => p.ListPackages)
+                                .Select(p => string.Format("{0}.{1}", p.id, p.version).ToLowerInvariant())
                 );
             return notUsed.ToList();
         }
@@ -37,7 +38,8 @@ namespace Meulekamp.NuGetReferenceChecker
         public List<string> FindPackageFilesNotInRepositoryFile()
         {
             var repositoryRegisteredFiles = _solutionLoader.RepositoryPackageFiles
-                .Select(s => GetFileName(s.Replace("..\\",""), _solutionLoader.SolutionRoot).FullName.ToLowerInvariant()).ToList();
+                                .Select(s => GetFileName(s.Replace("..\\",""), _solutionLoader.SolutionRoot).FullName.ToLowerInvariant())
+                                .ToList();
 
             return _solutionLoader.FoundPackageFiles.Select(s=>s.ToLowerInvariant())
                 .Except(repositoryRegisteredFiles)

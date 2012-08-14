@@ -11,15 +11,18 @@ namespace Meulekamp.NuGetReferenceChecker
     public class SolutionLoader
     {
         private readonly bool _useTraceWriter;
+        private readonly List<string> _ignorePaths;
         public List<string> FoundPackageFiles;
         public string NuGetRepositoryFile;
         public List<string> NugetPackageFolders;
         public List<string> RepositoryPackageFiles;
         public string SolutionRoot;
 
-        public SolutionLoader(bool useTraceWriter = false, string solutionFolder = null)
+
+        public SolutionLoader(bool useTraceWriter = false, string solutionFolder = null, List<string> ignorePaths = null)
         {
             _useTraceWriter = useTraceWriter;
+            _ignorePaths = ignorePaths;
             Projects = new List<VsProject>();
 
             CollectAll(solutionFolder);
@@ -41,7 +44,7 @@ namespace Meulekamp.NuGetReferenceChecker
             NuGetRepositoryFile = fileFinder.FindNuGetRepositoryInSolution(solutionPath);
             using (var xmlReader = new EnumerableXmlReader<repository>(NuGetRepositoryFile))
             {
-                RepositoryPackageFiles = xmlReader.Stream().Select(r => r.path).ToList();
+                RepositoryPackageFiles = xmlReader.Stream().Select(r => r.path).Where(f=>!IsInIgnorePath(f)).ToList();
             }
 
             LogWrite(string.Format("Packages.config found: {0}",
@@ -54,7 +57,7 @@ namespace Meulekamp.NuGetReferenceChecker
             LogWrite(string.Format("NuGet Packages found: {0}", string.Join(", ", NugetPackageFolders)));
 
             //do a search for all package files
-            FoundPackageFiles = fileFinder.FindPackageFilesInSolution(solutionPath).ToList();
+            FoundPackageFiles = fileFinder.FindPackageFilesInSolution(solutionPath).Where(f => !IsInIgnorePath(f)).ToList();
 
             LogWrite(string.Format("FindPackageFilesInSolution: {0}",
                                    string.Join(Environment.NewLine, FoundPackageFiles)));
@@ -99,6 +102,9 @@ namespace Meulekamp.NuGetReferenceChecker
                     );
             }
 
+            //filter projects by ignorepaths
+            Projects = Projects.Where(p => !IsInIgnorePath(p.ProjectFile)).ToList();
+
             LogWrite(string.Format("Total Projects found {0}:\n{1}", Projects.Count,
                                    string.Join(Environment.NewLine, Projects.Select(p => p.ProjectFile))));
         }
@@ -108,6 +114,22 @@ namespace Meulekamp.NuGetReferenceChecker
             if (!_useTraceWriter) return;
 
             Trace.WriteLine(message);
+        }
+
+        private bool IsInIgnorePath(string folder)
+        {
+            if (_ignorePaths == null || !_ignorePaths.Any()) return false;
+
+            foreach(var ignoreFolder in _ignorePaths)
+            {
+                var fullPath = Directory.Exists(ignoreFolder)
+                    ? ignoreFolder
+                    : Path.GetFullPath(Path.Combine(SolutionRoot, ignoreFolder));
+
+                if (folder.StartsWith(fullPath, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
         }
     }
 }

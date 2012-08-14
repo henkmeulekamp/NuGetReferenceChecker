@@ -3,7 +3,10 @@ using System.Diagnostics;
 using System.Xml.Serialization;
 
 namespace Meulekamp.NuGetReferenceChecker.Model
-{   
+{
+    // ReSharper disable InconsistentNaming
+    // supress reason: mostly model classes which reflect entities used in xml files.
+
     /// <remarks/>
     [Serializable]
     [XmlType(AnonymousType = true)]
@@ -30,9 +33,9 @@ namespace Meulekamp.NuGetReferenceChecker.Model
         public string version { get; set; }
     }
         
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
+    [SerializableAttribute]
+    [XmlTypeAttribute(AnonymousType = true)]
+    [XmlRootAttribute(Namespace = "", IsNullable = false)]
     [DebuggerDisplay("Reference={Include} -> HintPath={HintPath}")]
     public class Reference
     {
@@ -41,7 +44,8 @@ namespace Meulekamp.NuGetReferenceChecker.Model
         public string HintPath { get; set; }
 
         /// <remarks/>
-        [XmlAttribute()]
+        [XmlAttribute]
         public string Include { get; set; }
     }
+    // ReSharper restore InconsistentNaming
 }

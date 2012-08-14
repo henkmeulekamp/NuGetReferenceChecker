@@ -19,7 +19,14 @@ namespace NuGetReferenceCheck
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
-            var checker = new ReferenceChecker(new SolutionLoader(config.Verbose, config.SolutionFolder));
+
+            List<string> ignorefolders = null;
+            if(!string.IsNullOrWhiteSpace(config.IgnoreFolders))
+            {
+                ignorefolders = config.IgnoreFolders.Split(' ').ToList();
+            }
+
+            var checker = new ReferenceChecker(new SolutionLoader(config.Verbose, config.SolutionFolder, ignorefolders));
 
             Console.WriteLine(string.Format("Starting checker in SolutionFolder {0}",
                                             checker.SolutionFolder));
@@ -67,13 +74,16 @@ namespace NuGetReferenceCheck
         }
     }
 
-    //Use the excelent commandline parser:https://github.com/gsscoder/commandline/wiki/Quickstart
+    //Use commandline parser:https://github.com/gsscoder/commandline/wiki/Quickstart
     public class RunOptions
     {
-        [Option("v","verbose", Required = false, HelpText = "Verbose tracing")]
+        [Option("v","verbose", Required = false, HelpText = "Verbose tracing")]//not yet implemented;-)
         public bool Verbose { get; set; }
         [Option("p", "path", Required = false, HelpText = "SolutionFolderPath to scan")]
-        public string SolutionFolder { get; set; }      
+        public string SolutionFolder { get; set; }
+
+        [Option("i", "ignore", Required = false, HelpText = "Ignore folders, foldername in solution root, separated by space")] 
+        public string IgnoreFolders { get; set; }      
 
         [HelpOption]
         public string GetUsage()

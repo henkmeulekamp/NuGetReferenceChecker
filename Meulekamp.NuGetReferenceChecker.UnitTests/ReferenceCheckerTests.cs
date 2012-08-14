@@ -13,7 +13,9 @@ namespace Meulekamp.NuGetReferenceChecker.UnitTests
         public void SetupFixture()
         {
            //_checker = new ReferenceChecker(new SolutionLoader(true, 
-           //                  @"C:\Projects\SolutionFolderA\trunk"));
+           //                  @"C:\Projects2\phonixx\trunk\",
+           //                  new List<string>{"precompiledwebs", "applications"})); //ignore these subfolders of solution root
+
            _checker = new ReferenceChecker(new SolutionLoader());
         }
 
