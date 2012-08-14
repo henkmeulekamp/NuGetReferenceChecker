@@ -1,0 +1,1 @@
+..\.nuget\nuget pack ..\Buildscripts\NuGetReferenceChecker.1.0.0.nuspec -version 1.1.0.0
