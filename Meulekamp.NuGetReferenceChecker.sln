@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meulekamp.NuGetReferenceChecker", "Meulekamp.NuGetReferenceChecker\Meulekamp.NuGetReferenceChecker.csproj", "{842B7BAF-ABEC-4423-95E4-FC7A83E80748}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meulekamp.NuGetReferenceChecker.UnitTests", "Meulekamp.NuGetReferenceChecker.UnitTests\Meulekamp.NuGetReferenceChecker.UnitTests.csproj", "{4785CBD2-6CEA-4D5A-AAC5-2FEF7055CFFF}"

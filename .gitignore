@@ -33,3 +33,4 @@ PrecompiledWeb/
 *.gpState
 packages/
 References/
+*.nupkg
